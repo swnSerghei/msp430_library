@@ -16,11 +16,15 @@ typedef long                   			int32;	//-2 147 483 648 - 2 147 483 647
 typedef unsigned long long int         	uint64;
 typedef long long int         			int64;	//-9 223 372 036 854 775 808 - 9 223 372 036 854 775 807
 typedef uint8							bool;
-#define stop	0
-#define start	1
+
 #define false 0
 #define true 1
-
+typedef enum
+{
+    start=0,
+    stop_in_progress,
+    stop
+}Buck_state;
 typedef enum
 {
     no_any_limit=0,
@@ -41,4 +45,11 @@ typedef enum
     Hysteresis_zone,
     under_Voltage_or_current
 }Batt_states;
+typedef enum
+{
+    no_brake=0,
+    remove_brake_in_progress,
+    brake_in_progress,
+    braked
+}Brake_state;
 #endif /* COMMONTYPES_H_ */

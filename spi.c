@@ -47,8 +47,8 @@ UCB0CTLW0 &= ~UCSWRST;
 #ifdef __MSP430G2553__
     UCB0CTL1 |= UCSWRST;
 
-    P1SEL |= SIMO + CLK;
-    P1SEL2 |= SIMO + CLK;
+    P1SEL |= SIMO + SOMI + CLK;
+    P1SEL2 |= SIMO + SOMI + CLK;
 
     UCB0CTL0 |= UCMST;     //Master mode select
     UCB0CTL0 |= UCSYNC;    //syncron mode

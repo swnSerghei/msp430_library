@@ -15,8 +15,11 @@
 #include "commontypes.h"
 #include "printf.h"
 
-#define PWM_PANEL   BIT1
-#define SD_PANEL    BIT0
+#define PWM_BUCK    BIT2
+#define SD_BUCK    BIT1
+#define deactivate_Buck P3OUT &= ~SD_BUCK
+#define activate_Buck P3OUT |= SD_BUCK
+#define BUCK_timer TA1CCR1
 
 #define FREQUENCY 800 //20khz
 #define DeadTime  15 //deadTime
@@ -30,9 +33,10 @@ void calculate_MPPT();
 void calculate_MPPT_boost();
 extern void start_timer_Buck();
 extern void stop_timer_Buck();
+extern void configure_timer_Buck();
 extern uint8 FlagToActivateLowSide;
 extern volatile int16 MPPT_correction;
-extern uint8 timer_Buck_state;
+extern volatile Buck_state timer_Buck_state;
 extern int16 DebugValue;
 extern uint16 steepsForTrack_MPPT;
 extern bool inWichDirectionCheckingMPPT;

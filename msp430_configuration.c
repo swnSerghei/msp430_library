@@ -23,8 +23,8 @@ void configurationClock ()
     #endif
     #ifdef __MSP430G2553__
     IFG1=0;
-    P1DIR = 0;P2DIR = 0;P3DIR = 0;
-    P1OUT = 0;P2OUT = 0;P3OUT = 0;
+    P1DIR = 0;P2DIR = 0;P3DIR = 0;//BIT7 for SD_BRAKE and BIT
+    P1OUT = 0;P2OUT = 0;P3OUT = 0;//Deactivate first brake, BIT7 leave 0 for SD
     P1SEL = 0;P2SEL = 0;P3SEL = 0;
     P1SEL2= 0;P2SEL2= 0;P3SEL2= 0;
     DCOCTL = CALDCO_16MHZ; // Set DCO step + modulatio
@@ -34,6 +34,11 @@ void configurationClock ()
     //WDTCTL = WDTPW | WDTTMSEL | WDTCNTCL;//Watchdog timer+ password, NMI function, Interval timer mode, WDTCNT = 0000h
     //IE1   =  WDTIE;          //Enable the WDTIE bit
     //IE1   = WDTIE | OFIE | NMIIE | ACCVIE;//for reset debug
+
+    TA0CCR0 = FREQUENCY;
+    //        SMCLK      /1   Up to CCR0   clr
+    TA0CTL = TASSEL_2 + ID_0 + MC_1 + TACLR + TAIE;
+
     #endif
 }
 

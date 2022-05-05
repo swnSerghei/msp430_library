@@ -10,21 +10,22 @@
 #include <msp430.h>
 #include "commontypes.h"
 #include "WindTurbine.h"
-
-#define ENCODER_LEFT    BIT4
-#define ENCODER_RIGHT   BIT5
-#define ENCODER_OK      BIT3
+#include "brake.h"
+#define ENCODER_LEFT    BIT2
+#define ENCODER_RIGHT   BIT1
+#define ENCODER_OK      BIT0
 
 typedef enum
 {
-    left=0,
-    right,
-    OK
+    left=1,
+    right=2,
+    OK=4
 }encoderStates;
 
-extern int8 tmpCounter;
+extern int8 tmpCounter_encoder;
 extern bool manual_Test_Started;
-void interruptEncoder(encoderStates encoderState);
+extern uint8 encoderState;
+void Encoder_Check();
 void initEncoder();
 
 #endif /* ENCODER_H_ */

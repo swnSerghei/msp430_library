@@ -14,14 +14,14 @@
 
 
 #define Battery_R1 62000
-#define Battery_R2  2400
+#define Battery_R2  2310
 
-#define maximum_V_Battery_charging  56600    //2.4V/cell,14400 for 12V and 57600 for 48V
+#define maximum_V_Battery_charging  54500    //2.4V/cell,14400 for 12V and 57600 for 48V
 #define maximum_V_Battery_charging_In_ADCs  (int32)(((int32)(maximum_V_Battery_charging*(int32)Battery_R2)/((int32)Battery_R1+(int32)Battery_R2))*(int32)1000/(int32)uVs_per_1ADC)
 #define V_Battery_floating          13620    //2.27V/cell
 #define BatteryCapacity             400000
 
-#define Midle_ADCs_of_zero_Amps     689
+#define Midle_ADCs_of_zero_Amps     512
 #define maximum_A_Battery_charging  20000    //60A
 #define maximum_A_Battery_charging_IN_ADCs  (int32)maximum_A_Battery_charging/(int32)mAs_per1ADC_battery    //60A
 #define HISTEREZIS_BATTERY_VOLTAGE  500     //0.5V

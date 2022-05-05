@@ -10,22 +10,22 @@
 #include "commontypes.h"
 #include <msp430.h>
 #include "battery_functions.h"
-enum ADC_mapping
+enum ADC_mapping//mapping to A0..Ax
 {
-    V_boost = 0,
-    A_battery,
-    V_battery,
-    A_IN,
-    V_IN
+    A_IN=INCH_4,
+    V_battery=INCH_3,
+    V_boost = INCH_0,
+    A_battery=1,
+    V_IN=1
 };
 
-#define uVs_per_1ADC            2415
+#define uVs_per_1ADC            2455
 #define mAs_per1ADC_battery     191
 #define mAs_per1ADC_panel       41//88
 #define mAs_per1ADC_windTurbine 260//???? need to calibrate
-#define ADC_CHANNELS 5
+#define ADC_CHANNELS 3
 
-#define HowManyAVG_samples 8//change in code how many times to shift to right, if 2 move 1, 4 -> 2, 8 -> 3, 16 -> 4, 32 -> 5,      3mS For 16
+#define HowManyAVG_samples 16//change in code how many times to shift to right, if 2 move 1, 4 -> 2, 8 -> 3, 16 -> 4, 32 -> 5,      3mS For 16
 
 extern int32  last_good_MEM_panel_V,last_good_MEM_panel_A,last_good_MEM_battery_V,last_good_MEM_battery_A,last_good_MEM_Boost_V;
 extern int32 eroor_SD24MEM_battery_A,eroor_SD24MEM_panel_A;
@@ -41,8 +41,7 @@ struct ADC_values
 //    unsigned int currentSense_Generator_raw;  //ADC1
 //    unsigned int voltageGenerator_raw;        //ADC0
 };
-extern int ADC_rawData[ADC_CHANNELS];
-extern int ADC_rawData_sum[ADC_CHANNELS];
+extern int ADC_rawData[HowManyAVG_samples];
 int ADC_rawData_filtered[ADC_CHANNELS];
 extern bool filtered_ADCvalue_available;
 

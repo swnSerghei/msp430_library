@@ -33,7 +33,7 @@ Batt_states battery_check()
 void battery_V()
 {
     uint32 tmpValue;
-    tmpValue = ADC_rawData_filtered[V_battery];  //ADC
+    tmpValue = ADC_rawData_filtered[1];  //ADC
     tmpValue= ( (tmpValue*uVs_per_1ADC)/1000 );  //mV
 
     tmpValue = ((uint32)Battery_R1+(uint32)Battery_R2)*(uint32)tmpValue/(uint32)Battery_R2;//Vin mV
@@ -51,7 +51,7 @@ void battery_A()
     tmpValue = ADC_rawData_filtered[A_battery];
 //    tmpValue = tmpValue*(-1);
 
-    tmpValue*=mAs_per1ADC_battery;
+//    tmpValue*=mAs_per1ADC_battery;
     if (!Battery_A) Battery_A += tmpValue;
     else
     {

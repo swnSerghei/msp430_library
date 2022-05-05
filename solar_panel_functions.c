@@ -20,7 +20,7 @@ void solar_panel_V()
     tmpValue = ADC_rawData_filtered[V_IN];
     tmpValue = ( (tmpValue*uVs_per_1ADC)/1000 );
 
-    tmpValue = ((uint32)IN_R1+(uint32)IN_R2)*(uint32)tmpValue/(uint32)IN_R2;//Vin mV
+    //tmpValue = ((uint32)IN_R1+(uint32)IN_R2)*(uint32)tmpValue/(uint32)IN_R2;//Vin mV
 
     if (!SolarPanel_V) SolarPanel_V+=tmpValue;
     else
@@ -35,7 +35,11 @@ void calibrateZeroADC_panel()
 void solar_panel_A()
 {
     uint32 tmpValue;
-    tmpValue = ADC_rawData_filtered[A_IN];
+    tmpValue = ADC_rawData_filtered[2];
+    //start correction
+    if ( tmpValue > 248 ) tmpValue-=248;
+    else tmpValue = 0;
+    //end correction
 
     tmpValue = ( (tmpValue*mAs_per1ADC_panel));
 

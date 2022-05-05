@@ -11,7 +11,7 @@
 #include "commontypes.h"
 #include <msp430.h>
 
-#define rotation_read_pin BIT5
+#define rotation_read_pin BIT4
 
 #define how_manyTrigers_per_seconds 1
 

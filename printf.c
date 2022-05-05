@@ -33,8 +33,11 @@ void print(uint8 *string, ... )
 	 		 switch( string[i+1])
 	 		 {
 			 case 'd'://decimal
-				Printable.i = va_arg( vl, int16);
-				if (Printable.i < 0) {TxBuffer_Uart[TxBuffer_Uart_Tail] = '-';Uart_RecalculateTail_Buffer();Printable.ld= ((-1)*Printable.ld);}
+				Printable.i = va_arg(vl, int16);
+				if (Printable.i < 0)
+				{
+				    TxBuffer_Uart[TxBuffer_Uart_Tail] = '-';Uart_RecalculateTail_Buffer();Printable.ld= ((-1)*Printable.ld);
+				}
 				for (countIntegerNumber=1;( (Printable.i/10) / powValue ) != 0; countIntegerNumber++)
 				{
 					powValue*=10;

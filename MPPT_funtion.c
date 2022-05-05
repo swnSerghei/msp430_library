@@ -13,14 +13,14 @@ int16 best_steep_MPPT = 0;
 
 uint8  CheckMPPT_timer = 0;
 
-uint8 timer_Buck_state = stop;
+volatile Buck_state timer_Buck_state = stop;
 void start_timer_Buck()
 {
 #ifdef __MSP430G2955__
     TA1CCR1 = DeadTime;//minimum frequency start
 //    TA1CCR1 = TA0CCR0 - DeadTime;
-    P1SEL |= PWM_PANEL;
-    P1OUT |= SD_PANEL;
+    P1SEL |= PWM_BUCK;
+    P1OUT |= SD_BUCK;
 
     TA0CCTL2 = OUTMOD_7;//Set/Rese
     TA0CTL &= ~TAIFG;
@@ -29,17 +29,32 @@ void start_timer_Buck()
 //                TA0CTL = TASSEL_2 + ID_0 + MC_1;
 #endif
 #ifdef __MSP430G2553__
-    TA1CCR1 = FREQUENCY-DeadTime;//minimum frequency start
-    //TA1CCR2 = FREQUENCY-(FREQUENCY>>4);
-    P2SEL |= PWM_PANEL;
-    TA1CCTL1 = OUTMOD_7;//Set/Rese
-    //TA1CTL &= ~TAIFG;
-    //        SMCLK      /1   UP_CCR0
-    //TA1CCTL1 |= CCIE;
-    //TA1CCTL2 |= CCIE;
-    P2OUT |= SD_PANEL;
+    MPPT_correction = 0;
+    TA1CCR1 = DeadTime;//minimum frequency start
+    activate_Buck;
+    P3SEL |= PWM_BUCK;
+    TA1CCTL1 = OUTMOD_7+CCIE;//Set/Reset
+    TA1CTL &= ~TAIE;
 #endif
     timer_Buck_state = start;
+}
+void configure_timer_Buck()
+{
+#ifdef __MSP430G2553__
+    TA1CCR0 = FREQUENCY;
+    P3DIR |= (PWM_BUCK + SD_BUCK);
+    P3SEL &= ~PWM_BUCK;
+    //        SMCLK      /1   Up to CCR0   clr
+    TA1CTL = TASSEL_2 + ID_0 + MC_1 + TACLR + TAIE;
+
+    TA1CCTL1  = OUTMOD_0;
+    P3SEL &= ~PWM_BUCK;
+    P3OUT &= ~PWM_BUCK;
+    MPPT_correction=0;
+    deactivate_Buck;
+    timer_Buck_state = stop;
+
+#endif
 }
 void stop_timer_Buck()
 {
@@ -49,10 +64,10 @@ void stop_timer_Buck()
     TA0CCR0 = FREQUENCY;
     TA1CCR1 = DeadTime;//minimum frequency start
 
-    P1OUT &= ~(PWM_PANEL + SD_PANEL);
-    P1DIR |= PWM_PANEL + SD_PANEL;
+    P1OUT &= ~(PWM_BUCK + SD_BUCK);
+    P1DIR |= PWM_BUCK + SD_BUCK;
 
-    P1SEL |= PWM_PANEL;
+    P1SEL |= PWM_BUCK;
 
     TA0CTL &= ~TAIFG;
     //        SMCLK      /1   stop   clr
@@ -60,26 +75,20 @@ void stop_timer_Buck()
 
 #endif
 #ifdef __MSP430G2553__
-    //TA1CCTL2 = OUTMOD_5;
-
-    TA1CCR0 = FREQUENCY;
-    TA1CCR1 = DeadTime;//minimum frequency start
-
-    P2DIR |= (PWM_PANEL + SD_PANEL);
-
-    TA1CTL &= ~TAIFG;
-    TA1CCTL0 &= ~CCIE;
-    TA1CCTL1 &= ~CCIE;
-    TA1CCTL2 &= ~CCIE;
-    //        SMCLK      /1   Up to CCR0   clr
-    TA1CTL = TASSEL_2 + ID_0 + MC_1 + TACLR + TAIE;
-
-    P2SEL &= ~PWM_PANEL;
-    P2OUT &= ~PWM_PANEL;
-    P2OUT &= ~SD_PANEL;
-    MPPT_correction=0;
+    if ( (BUCK_timer <= DeadTime) && (timer_Buck_state == stop_in_progress) )
+    {
+        TA1CCTL1  = OUTMOD_0;
+        P3SEL &= ~PWM_BUCK;
+        P3OUT &= ~PWM_BUCK;
+        //deactivate_Buck;
+        timer_Buck_state = stop;
+        TA1CTL |= TAIE;
+    }
+    else if( timer_Buck_state == start )
+    {
+        timer_Buck_state = stop_in_progress;
+    }
 #endif
-    timer_Buck_state = stop;
 }
 
 volatile int16 MPPT_correction = 0;
