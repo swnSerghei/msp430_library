@@ -24,6 +24,7 @@ enum ADC_mapping//mapping to A0..Ax
 #define mAs_per1ADC_panel       41//88
 #define mAs_per1ADC_windTurbine 260//???? need to calibrate
 #define ADC_CHANNELS 3
+#define ADC_EnableConversion_StartConversion ADC10CTL0 |= ENC + ADC10SC
 
 #define HowManyAVG_samples 16//change in code how many times to shift to right, if 2 move 1, 4 -> 2, 8 -> 3, 16 -> 4, 32 -> 5,      3mS For 16
 

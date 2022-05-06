@@ -126,10 +126,8 @@ __interrupt void WatchDogTimer(void)//2.064ms Task
     counterWd++;
 }
 #pragma vector=TIMER0_A0_VECTOR
-
 __interrupt void Timer0_A0 (void)//25 priority
 {
-
 }
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void Timer0_A1 (void)//24 priority
@@ -172,16 +170,29 @@ __interrupt void Timer0_A1 (void)//24 priority
 //        else TA0CCR2 = FREQUENCY-(FREQUENCY>>4);
 //        TA0CCTL2 &= ~CCIFG;
 //    }
-    if (TA0IV & TA0IV_TACCR1)
-     {
+    switch (TA0IV)
+    {
+    case TA0IV_TACCR1:
+    {
         if (brake_state == remove_brake_in_progress || brake_state == brake_in_progress)
-            {
-                BRAKE_TIMER_PWM += brake_correction;
-                brake_correction -= brake_correction;
-            }
-            TA0CCTL0 &= ~CCIFG;
-     }
-     counterTimer++;
+        {
+            BRAKE_TIMER_PWM += brake_correction;
+            brake_correction -= brake_correction;
+        }
+        TA0CCTL1 &= ~CCIFG;
+        break;
+    }
+    case TA0IV_TACCR2:
+        {
+        TA0CCTL2 &= ~CCIFG;
+        break;
+        }
+    case TA0IV_TAIFG:
+        {
+            break;
+        }
+    }
+    counterTimer++;
 //    TA0CTL &= ~TAIFG;
 //    __enable_interrupt();
 }

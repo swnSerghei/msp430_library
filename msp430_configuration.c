@@ -35,9 +35,9 @@ void configurationClock ()
     //IE1   =  WDTIE;          //Enable the WDTIE bit
     //IE1   = WDTIE | OFIE | NMIIE | ACCVIE;//for reset debug
 
-    TA0CCR0 = FREQUENCY;
-    //        SMCLK      /1   Up to CCR0   clr
-    TA0CTL = TASSEL_2 + ID_0 + MC_1 + TACLR + TAIE;
+//    TA0CCR0 = FREQUENCY;
+//    //        SMCLK      /1   Up to CCR0   clr
+//    TA0CTL = TASSEL_2 + ID_0 + MC_1 + TACLR + TAIE;
 
     #endif
 }

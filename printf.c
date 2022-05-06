@@ -153,5 +153,5 @@ void print(uint8 *string, ... )
 			Uart_RecalculateTail_Buffer();
 		 }
 	 }
-	 Uart_TX_Interrupt();
+	 if (!uartInProgress) Uart_TX_Interrupt();
 }

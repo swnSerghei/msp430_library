@@ -77,11 +77,14 @@ void init_adc()
 
 #endif
 #ifdef __MSP430G2553__
+    ADC10CTL0 = 0;
+    ADC10CTL1 = 0;
+    ADC10DTC0 = 0;
     while (ADC10CTL1 & BUSY);
     ADC10DTC1 = HowManyAVG_samples;
     ADC10DTC0 |=  ADC10CT;           //ADC10 continuous transfer
     ADC10SA    = (unsigned int)ADC_rawData;
-    ADC10CTL1 |= A_IN;           //Multi-channel repeated conversion starting from channel 6,With INCH_5 we select the starting channel (in this case we start from channel 6, then we sample channel 5 and so on all the way down to channel 0).
+    ADC10CTL1 |= V_battery;           //Multi-channel repeated conversion starting from channel 6,With INCH_5 we select the starting channel (in this case we start from channel 6, then we sample channel 5 and so on all the way down to channel 0).
     ADC10CTL1 |= CONSEQ_2;          /* Sequence of channels */
     ADC10CTL1 |= ADC10DIV_1;
     ADC10CTL0 |= ADC10SHT_2;          //ADC10 sample-and-hold time
@@ -91,7 +94,7 @@ void init_adc()
     ADC10CTL0 |= REF2_5V;            //Reference-generator voltage.e. REFON must also be set. 2.5 V
     //ADC10CTL0 |= ADC10SR ;              /* ADC10 Sampling Rate 0:200ksps / 1:50ksps */
     ADC10CTL0 |= SREF_1;                // SREF_0 >>> /* VR+ = AVCC and VR- = AVSS */, SREF_1 >>>> /* VR+ = VREF+ and VR- = AVSS */
-    ADC10AE0  |= BIT4 + BIT3 + BIT0;              //Analog input enabled A0..A6
+    ADC10AE0  = BIT4 + BIT3 + BIT0;    //Analog input enabled A0..A6
     ADC10CTL0 &=~ADC10IFG;              //Cleare Interrupt Flag
     ADC10CTL0 |= ENC + ADC10SC;         //Enable conversion + Start conversion.
     ADC10CTL0 |= ADC10IE;               //ADC10 interrupt enable
@@ -106,12 +109,13 @@ void start_adc()
 uint8 counter_ADC_samples = 0;
 void interrupt_ADC()
 {
-    int i,j;
-         if (ADC10CTL1 & INCH_4) j=2;
-    else if (ADC10CTL1 & INCH_3) j=1;
-    else if (ADC10CTL1 & INCH_0) j=0;
+    uint8 i=0xff,j=0xff;
+    uint16 ADC10CTL1_local = ADC10CTL1;
+         if ((ADC10CTL1&INCH_4) == INCH_4) j=2;
+    else if ((ADC10CTL1&INCH_3) == INCH_3) j=1;
+    else if ((ADC10CTL1&INCH_0) == INCH_0) j=0;
     ADC_rawData_filtered[j]  = 0;
-        for (i=(HowManyAVG_samples-1);i>=0;i--)
+        for (i=0;i<HowManyAVG_samples;i++)
         {
             ADC_rawData_filtered[j] += ADC_rawData[i];
         }
@@ -120,13 +124,13 @@ void interrupt_ADC()
         {
             ADC10CTL1 &= ~A_IN;
             ADC10CTL1 |= V_battery;
-            ADC10CTL0 |= ENC + ADC10SC;         //Enable conversion + Start conversion.
+            ADC_EnableConversion_StartConversion;
         }
         else if ((ADC10CTL1 & V_battery) == V_battery)
         {
             ADC10CTL1 &= ~V_battery;
             ADC10CTL1 |= V_boost;
-            ADC10CTL0 |= ENC + ADC10SC;         //Enable conversion + Start conversion.
+            ADC_EnableConversion_StartConversion;
         }
         else if ((ADC10CTL1 & V_boost) == V_boost)
         {
