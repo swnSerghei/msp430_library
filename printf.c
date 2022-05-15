@@ -22,7 +22,9 @@ void print(uint8 *string, ... )
 		 union Printable_t
 	 	 {
 		 int16  i;
+		 uint16 u;
 		 int32  ld;
+		 uint32 lu;
 		 float   f;
 		 char    c;
 		 char   *s;
@@ -36,7 +38,8 @@ void print(uint8 *string, ... )
 				Printable.i = va_arg(vl, int16);
 				if (Printable.i < 0)
 				{
-				    TxBuffer_Uart[TxBuffer_Uart_Tail] = '-';Uart_RecalculateTail_Buffer();Printable.ld= ((-1)*Printable.ld);
+				    Uart_Fill_TX_Buffer('-');
+				    Printable.ld= ((-1)*Printable.ld);
 				}
 				for (countIntegerNumber=1;( (Printable.i/10) / powValue ) != 0; countIntegerNumber++)
 				{
@@ -46,22 +49,21 @@ void print(uint8 *string, ... )
 				{
 					if (countIntegerNumber == 1)
 					{
-						TxBuffer_Uart[TxBuffer_Uart_Tail] = (uint8)Printable.i+48;
+					    Uart_Fill_TX_Buffer((uint8)Printable.i+48);
 					} //in case if only 1 digit
 					else
 					{
-					TxBuffer_Uart[TxBuffer_Uart_Tail]=(Printable.i / powValue)+48;
-					Printable.i %= powValue;
-					powValue/=10;
+					    Uart_Fill_TX_Buffer((Printable.i / powValue)+48);
+                        Printable.i %= powValue;
+                        powValue/=10;
 					}
-					Uart_RecalculateTail_Buffer();
 					countIntegerNumber--;
 				}
+             i++; //increment d, % incrementing by for()
 			 break;
-			 case 'l'://decimal
-                 Printable.ld = va_arg( vl, int32);
-                 if (Printable.ld < 0) {TxBuffer_Uart[TxBuffer_Uart_Tail] = '-';Uart_RecalculateTail_Buffer();Printable.ld= ((-1)*Printable.ld);}
-                 for (countIntegerNumber=1;( (Printable.ld/10) / powValue ) != 0; countIntegerNumber++)
+			 case 'u'://decimal
+                 Printable.u = va_arg(vl, int16);
+                 for (countIntegerNumber=1;( (Printable.u/10) / powValue ) != 0; countIntegerNumber++)
                  {
                      powValue*=10;
                  }
@@ -69,63 +71,121 @@ void print(uint8 *string, ... )
                  {
                      if (countIntegerNumber == 1)
                      {
-                         TxBuffer_Uart[TxBuffer_Uart_Tail] = (uint8)Printable.ld+48;
+                         Uart_Fill_TX_Buffer((uint8)Printable.u+48);
                      } //in case if only 1 digit
                      else
                      {
-                     TxBuffer_Uart[TxBuffer_Uart_Tail]=(Printable.ld / powValue)+48;
-                     Printable.ld %= powValue;
-                     powValue/=10;
+                         Uart_Fill_TX_Buffer((Printable.u / powValue)+48);
+                         Printable.u %= powValue;
+                         powValue/=10;
                      }
-                     Uart_RecalculateTail_Buffer();
                      countIntegerNumber--;
                  }
+                 i++; //increment d, % incrementing by for()
+                 break;
+			 case 'l'://long
+			     if ( (string[i+2] != 'u') )
+                 {
+			         if ( string[i+2] == 'd' )  i++;//mean %ld; % increment by for, l by the end of case, d by i++
+                     Printable.ld = va_arg( vl, int32);
+                     if (Printable.ld < 0)
+                     {
+                         Uart_Fill_TX_Buffer('-');
+                         Printable.ld= ((-1)*Printable.ld);
+                     }
+                     for (countIntegerNumber=1;( (Printable.ld/10) / powValue ) != 0; countIntegerNumber++)
+                     {
+                         powValue*=10;
+                     }
+                     while(countIntegerNumber)
+                     {
+                         if (countIntegerNumber == 1)
+                         {
+                             Uart_Fill_TX_Buffer( (uint8)Printable.ld+48);
+                         } //in case if only 1 digit
+                         else
+                         {
+                             Uart_Fill_TX_Buffer((Printable.ld / powValue)+48);
+                             Printable.ld %= powValue;
+                             powValue/=10;
+                         }
+                         countIntegerNumber--;
+                     }
+                 }
+                     else//lu
+                     {
+                         i++;//mean %lu; % increment by for, l by the end of case, u by i++
+                         Printable.lu = va_arg( vl, uint32);
+                         for (countIntegerNumber=1;( (Printable.lu/10) / powValue ) != 0; countIntegerNumber++)
+                          {
+                              powValue*=10;
+                          }
+                          while(countIntegerNumber)
+                          {
+                              if (countIntegerNumber == 1)
+                              {
+                                  Uart_Fill_TX_Buffer( (uint8)Printable.lu+48);
+                              } //in case if only 1 digit
+                              else
+                              {
+                                  Uart_Fill_TX_Buffer((Printable.lu / powValue)+48);
+                                  Printable.lu %= powValue;
+                                  powValue/=10;
+                              }
+                              countIntegerNumber--;
+                      }
+                     }
+			     i++; //increment l, % incrementing by for()
              break;
 			 case 'f':
 				Printable.f = va_arg( vl, double );
 				tmpValue = (uint32)Printable.f;
-
 				for (countIntegerNumber=1;( tmpValue / (10*powValue) ) != 0; countIntegerNumber++)
 				{
 					powValue*=10;
 				}
-				if (Printable.f < 0) {TxBuffer_Uart[TxBuffer_Uart_Tail] = '-';Uart_RecalculateTail_Buffer();Printable.f= ((-1)*Printable.f);}
+				if (Printable.f < 0)
+				{
+				    Uart_Fill_TX_Buffer('-');
+				    Printable.f= ((-1)*Printable.f);
+				}
 				while(countIntegerNumber)
 				{
 					if (countIntegerNumber == 1)
 					{
-						TxBuffer_Uart[TxBuffer_Uart_Tail] = (uint8)tmpValue+48;
+					    Uart_Fill_TX_Buffer( (uint8)tmpValue+48 );
 					} //in case if only 1 digit
 					else
 					{
-					TxBuffer_Uart[TxBuffer_Uart_Tail]=(tmpValue / powValue)+48;
-					tmpValue %= powValue;
-					powValue/=10;
+                        Uart_Fill_TX_Buffer( (tmpValue / powValue)+48 );
+                        tmpValue %= powValue;
+                        powValue/=10;
 					}
-					Uart_RecalculateTail_Buffer();
 					countIntegerNumber--;
 				}
 				tmpValue = (uint32)Printable.f * 100;
 				Printable.f *= 100;
-
 				tmpValue = (uint32)Printable.f%tmpValue;
-				TxBuffer_Uart[TxBuffer_Uart_Tail]='.';
-				Uart_RecalculateTail_Buffer();
-				TxBuffer_Uart[TxBuffer_Uart_Tail]=( (tmpValue / 10)+48 );
-				Uart_RecalculateTail_Buffer();
-				TxBuffer_Uart[TxBuffer_Uart_Tail]=(tmpValue % 10)+48;
-				Uart_RecalculateTail_Buffer();
+				Uart_Fill_TX_Buffer('.');
+				Uart_Fill_TX_Buffer( (tmpValue / 10)+48 );
+				Uart_Fill_TX_Buffer((tmpValue % 10)+48);
+				i++; //increment f, % incrementing by for()
 				 //printf_s( "%f\n", Printable.f );
 			 break;
 
 			 case 'c':
 				 Printable.c = va_arg( vl, char );
-				 //printf_s( "%c\n", Printable.c );
+				 Uart_Fill_TX_Buffer( Printable.c);
+				 i++;
 			 break;
 
 			 case 's':
-				 Printable.s = va_arg( vl, char * );
-				// printf_s( "%s\n", Printable.s );
+//				 Printable.s = va_arg( vl, char * );
+//				 while( Printable.s != 0 )
+//                 {
+//                     Uart_Fill_TX_Buffer( Printable.s);
+//                     Printable.s++;
+//                 }
 			 break;
 			 case 'x':
 //                 Printable.ld = va_arg( vl, uint32 );
@@ -138,20 +198,16 @@ void print(uint8 *string, ... )
              break;
 			 default:
 			 {
-				 TxBuffer_Uart[TxBuffer_Uart_Tail] = string[i];
-				 Uart_RecalculateTail_Buffer();
-			 	 TxBuffer_Uart[TxBuffer_Uart_Tail] = string[i+1];
-			 	 Uart_RecalculateTail_Buffer();
+			     Uart_Fill_TX_Buffer( string[i]);
+				 //Uart_Fill_TX_Buffer(string[i+1]);
 			 }
 			 break;
 	 		 }
-	 		 i++;
+
 	 	 }
 		 else
 		 {
-			TxBuffer_Uart[TxBuffer_Uart_Tail] = string[i];
-			Uart_RecalculateTail_Buffer();
+		    Uart_Fill_TX_Buffer( string[i] );
 		 }
 	 }
-	 if (!uartInProgress) Uart_TX_Interrupt();
 }

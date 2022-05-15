@@ -16,7 +16,6 @@
 #define how_manyTrigers_per_seconds 1
 
 void setup_rotation();
-void setup_rotation();
 void  interrupt_routin();
 void trigeredFunctionEvery_2_SecondToCalculateRotatiom();
 uint16 read_rotation();

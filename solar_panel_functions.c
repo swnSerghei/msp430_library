@@ -16,18 +16,18 @@ int32 get_MPPT_mWats()
 }
 void solar_panel_V()
 {
-    uint32 tmpValue;
-    tmpValue = ADC_rawData_filtered[V_IN];
-    tmpValue = ( (tmpValue*uVs_per_1ADC)/1000 );
-
-    //tmpValue = ((uint32)IN_R1+(uint32)IN_R2)*(uint32)tmpValue/(uint32)IN_R2;//Vin mV
-
-    if (!SolarPanel_V) SolarPanel_V+=tmpValue;
-    else
-    {
-        SolarPanel_V+=tmpValue;
-        SolarPanel_V/=2;
-    }
+//    uint32 tmpValue;
+//    tmpValue = ADC_rawData_filtered[V_IN];
+//    tmpValue = ( (tmpValue*uVs_per_1ADC)/1000 );
+//
+//    //tmpValue = ((uint32)IN_R1+(uint32)IN_R2)*(uint32)tmpValue/(uint32)IN_R2;//Vin mV
+//
+//    if (!SolarPanel_V) SolarPanel_V+=tmpValue;
+//    else
+//    {
+//        SolarPanel_V+=tmpValue;
+//        SolarPanel_V/=2;
+//    }
 }
 void calibrateZeroADC_panel()
 {

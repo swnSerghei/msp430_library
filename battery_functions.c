@@ -47,18 +47,18 @@ void battery_V()
 }
 void battery_A()
 {
-    int32 tmpValue;
-    tmpValue = ADC_rawData_filtered[A_battery];
-//    tmpValue = tmpValue*(-1);
-
-//    tmpValue*=mAs_per1ADC_battery;
-    if (!Battery_A) Battery_A += tmpValue;
-    else
-    {
-        Battery_A += tmpValue;
-        Battery_A/=2;
-    }
-
+//    int32 tmpValue;
+//    tmpValue = ADC_rawData_filtered[A_battery];
+////    tmpValue = tmpValue*(-1);
+//
+////    tmpValue*=mAs_per1ADC_battery;
+//    if (!Battery_A) Battery_A += tmpValue;
+//    else
+//    {
+//        Battery_A += tmpValue;
+//        Battery_A/=2;
+//    }
+//
 }
 
 uint32 countsForAmpsBattery=0;
